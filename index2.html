@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background-color: #ff6801;
+      color: white;
+      text-align: center;
+    }
+
+    #dice-container {
+      text-align: center;
+      padding: 20px;
+    }
+    #instructions {
+        font-size: 18px;
+        margin: 10px;
+      }
+    #dice {
+      width: 150px;
+      height: 150px;
+      background-color: #fff;
+      border: 2px solid #000;
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .dot {
+      width: 20%;
+      height: 20%;
+      background-color: #ff6801;
+      border-radius: 50%;
+      margin: 5%;
+      animation: bounce 2s infinite;
+    }
+
+    #rollButton {
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 5px 20px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 30px;
+      margin-top: 20px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #message {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    .otp {
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 18px;
+      display: block;
+      margin: 0 auto;
+      margin-top: 20px;
+    }
+
+    @keyframes rollDice {
+      0% {
+        transform: rotate(0deg);
+      }
+      25% {
+        transform: rotate(-90deg);
+      }
+      50% {
+        transform: rotate(0deg);
+      }
+      75% {
+        transform: rotate(-90deg);
+      }
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+
+    @keyframes bounce {
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-15px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Dice Game</h1>
+  <div id="instructions">
+    <p>Roll the dice. If you roll a 6, you will be the lucky one for today and receive an OTP code. If you purchase a product worth 499+ taka, you can use this OTP code to participate in the mystery box contest. You can play this game once every 24 hours.</p>
+  </div>
+  <div id="dice-container">
+    <div id="dice"></div>
+    <button id="rollButton">Roll Dice</button>
+    <p id="message"></p>
+    <button id="getOTP" class="otp" style="display: none;">Get OTP</button>
+  </div>
+
+  <script>
+    const rollButton = document.getElementById('rollButton');
+    const dice = document.getElementById('dice');
+    const resultElement = document.getElementById('message');
+    const getOTPButton = document.getElementById('getOTP');
+
+    let lastRollTime = 0;
+    let canRoll = true;
+
+    function rollDice() {
+      if (canRoll) {
+        const currentTime = new Date().getTime();
+
+        if (currentTime - lastRollTime >= 24 * 60 * 60 * 1000) {
+          const min = 1;
+          const max = 6;
+          const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+
+          // Disable the roll button while animating
+          rollButton.disabled = true;
+          dice.style.animation = 'rollDice 2s ease-out';
+
+          setTimeout(() => {
+            // Clear any existing dots
+            dice.innerHTML = '';
+
+            // Create dots based on the random number
+            for (let i = 0; i < randomNum; i++) {
+              dice.innerHTML += '<div class="dot"></div>';
+            }
+
+            resultElement.textContent = `You rolled a ${randomNum}`;
+            lastRollTime = currentTime;
+
+            if (randomNum === 6) {
+              getOTPButton.style.display = 'block';
+            }
+
+            canRoll = false;
+
+            // Reset the animation
+            dice.style.animation = 'none';
+
+            // Enable the roll button
+            rollButton.disabled = false;
+          }, 2000); // Wait for the animation to complete
+        } else {
+          resultElement.textContent = 'You can roll the dice again after 24 hours.';
+        }
+      }
+    }
+
+    function getOTP() {
+      // Generate and display a 4-digit OTP
+      const otp = Math.floor(1000 + Math.random() * 9000);
+      resultElement.textContent = `Your OTP is: ${otp}`;
+      getOTPButton.disabled = true;
+    }
+
+    rollButton.addEventListener('click', rollDice);
+    getOTPButton.addEventListener('click', getOTP);
+  </script>
+</body>
+</html>
